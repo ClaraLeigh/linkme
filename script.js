@@ -80,6 +80,9 @@ function renderProfile(avatar, displayName, shortBio) {
   shortBio = decompressText(shortBio);
   document.getElementById('displayName').textContent = displayName;
   document.getElementById('shortBio').textContent = shortBio;
+
+  // Set the page title, strip bad characters
+  document.title = `${displayName} | LinkMe`;
 }
 
 // Render the links on the page
