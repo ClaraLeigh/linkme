@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Links</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
+    <script src="dict.js"></script>
+    <script src="script.js" defer></script>
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter var'],
+            },
+          }
+        },
+        daisyui: {
+          themes: true,
+        }
+      }
+    </script>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center">
+    <div class="flex flex-col items-center justify-start p-6 lg:px-8 lg:py-12 bg-base-200 rounded-lg shadow-xl z-10">
+        <div class="profile mb-8 flex flex-col items-center">
+            <img id="avatar" class="profile-avatar w-24 h-24 rounded-full hidden mb-4" alt="Avatar">
+            <h1 id="displayName" class="profile-name text-3xl font-bold"></h1>
+            <p id="shortBio" class="profile-bio max-w-lg mt-2 text-center"></p>
+        </div>
+        <div id="links" class="space-y-4 flex flex-col"></div>
+    </div>
+</body>
+</html>
