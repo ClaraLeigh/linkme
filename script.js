@@ -46,7 +46,7 @@ function decodeData(encodedData) {
       }
       return { u: parts[0], n: decodeURIComponent(parts[1]) };
     });
-    return { t: themeCode, a:avatar, d: decodeURIComponent(displayName), b: decodeURIComponent(shortBio), l: links };
+    return { t: themeCode, a: avatar, d: decodeURIComponent(displayName), b: decodeURIComponent(shortBio), l: links };
   } catch (e) {
     console.error('Failed to decode data:', e);
     return null;
@@ -56,28 +56,58 @@ function decodeData(encodedData) {
 // Apply the theme
 function applyTheme(themeCode) {
   const themeClass = themeDictionary[themeCode];
-  document.documentElement.setAttribute('data-theme', themeClass);
+  if (themeClass) {
+    document.documentElement.setAttribute('data-theme', themeClass);
+  } else {
+    console.error('Invalid theme code');
+  }
+
   // if theme is D, then add a background image
   if (themeClass === 'dracula') {
     document.body.style.backgroundImage = 'url("cats.webp")';
     document.body.className = 'bg-cover bg-center min-h-screen flex flex-col items-center justify-center';
-    // lets add a slight overlay
+
     const overlay = document.createElement('div');
     overlay.className = 'absolute inset-0 bg-black opacity-50';
     document.body.appendChild(overlay);
   }
 }
 
-// Render the profile
-function renderProfile(avatar, displayName, shortBio) {
-  if (avatar && avatar.length > 0) {
-    document.getElementById('avatar').style.display = 'block';
-    avatar = decodeURIComponent(avatar);
-    avatar = decompressUrl(avatar);
-    document.getElementById('avatar').src = avatar;
+function isValidUrl(url) {
+  try {
+    const parsedUrl = new URL(url);
+    return parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:';
+  } catch (e) {
+    return false;
   }
+}
+
+function setAvatar(avatar) {
+  if (!avatar || !avatar.length) {
+    return;
+  }
+  const avatarDecoded = decodeURIComponent(avatar);
+  const avatarUrl = decompressUrl(avatarDecoded);
+
+  if (isValidUrl(avatarUrl)) {
+    document.getElementById('avatar').style.display = 'block';
+    document.getElementById('avatar').src = avatarUrl;
+  } else {
+    console.error('Invalid avatar URL');
+  }
+}
+
+function sanitizeUrl(url) {
+  const safeUrlPattern = /^(https?:|mailto:|tel:)/i;
+  return safeUrlPattern.test(url) ? url : '#';
+}
+
+function renderProfile(avatar, displayName, shortBio) {
+  setAvatar(avatar);
+
   displayName = decompressText(displayName);
   shortBio = decompressText(shortBio);
+
   document.getElementById('displayName').textContent = displayName;
   document.getElementById('shortBio').textContent = shortBio;
 
@@ -96,15 +126,16 @@ function renderLinks(data) {
     } else {
       url = urlDictionary[link.u] || link.u;
     }
+
     const urlName = urlNameDictionary[link.u];
-    // const icon = iconDictionary[link.u] || '🔗';
     const a = document.createElement('a');
-    a.href = url + link.n;
+
+    a.href = sanitizeUrl(url + link.n);
     a.target = '_blank';
     a.rel = 'noopener noreferrer';
     a.className = 'btn btn-primary btn-outline btn-sm btn-wide';
-    // a.innerHTML = `<span class="link-icon">${icon}</span>${link.n}`;
-    a.innerHTML = urlName;
+    a.textContent = urlName || 'Unknown Link';
+
     linksContainer.appendChild(a);
   });
 }
